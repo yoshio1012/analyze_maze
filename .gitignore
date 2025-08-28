@@ -1,0 +1,9 @@
+# Raw / interim は追跡しない
+data/raw/**
+data/interim/**
+
+# フォルダ維持用ファイルは許可
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/raw/README.md
+!data/interim/README.md
