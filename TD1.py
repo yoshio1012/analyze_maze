@@ -8,41 +8,16 @@
 import json
 import os
 
-#迷路の選択
-MAZE = input("どの迷路か選択して下さい:P or 1 or 2 or 3")
-if MAZE == "1":
-    with open("maze_data/maze1.json", 'r') as f:
-        maze_data = json.load(f)
-    goal_rows = 3
-    goal_cols = 27
-
-elif MAZE == "2":
-    with open("maze_data/maze2.json", 'r') as f:
-        maze_data = json.load(f)  
-    goal_rows = 23
-    goal_cols = 15
-
-elif MAZE == "3":
-    with open("maze_data/maze3.json", 'r') as f:
-        maze_data = json.load(f)
-    goal_rows = 17
-    goal_cols = 21
-
-elif MAZE == "P":
-    with open("maze_data/mazeP.json", 'r') as f:
-        maze_data = json.load(f)
-    goal_rows = 17
-    goal_cols = 17
-
-else:
-    print("1, 2, 3のいずれかを入力して下さい")
-    exit()
+with open("maze_data/maze1.json", 'r') as f:
+    maze_data = json.load(f)
+goal_rows = 3
+goal_cols = 27
 
 #行動履歴データ
-with open("yobi1/ep1_result/move_history.json", 'r') as f:
+with open("yobi2/ep1_result/move_history.json", 'r') as f:
     move_data = json.load(f)
 
-with open("yobi1/ep1_result/visited_history.json", 'r') as f:
+with open("yobi2/ep1_result/visited_history.json", 'r') as f:
     visited_data = json.load(f)
 
 #TD学習のパラメータ
@@ -106,7 +81,7 @@ for Alp in alpha:
 
 
 # ===== 保存 =====
-with open("Ay1/y101_TD_error.json", "w") as f:
+with open("Ay2/y201_TD_error.json", "w") as f:
     json.dump(All_TD, f, indent=2)
 
 print("TD誤差を TD_error_results.json に保存しました。")
