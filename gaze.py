@@ -1,70 +1,67 @@
 import pandas as pd
 import json
 
-# --- 1. データ読み込み ---
-# TSV (瞳孔径データ)
-df = pd.read_csv("yobi101.tsv", sep="\t", usecols=[
-    "Eyetracker timestamp", 
-    "Pupil diameter left", "Pupil diameter right","event"
-])
+# --- TSVデータ読み込み ---
+df = pd.read_csv("data/raw/yobi101.tsv", sep="\t")
+df["ts"] = df["Computer timestamp"].astype(float)  # ミリ秒
 
-# JSON (試行ごとの開始・終了)
-with open("time_result.json", "r") as f:
-    trials = json.load(f)
-
-# --- 2. 瞬き判定列（両目とも NaN のとき True） ---
-#isna() は pandas のメソッドで、「そのセルが 欠損値 (NaN: Not a Number) かどうか」を判定して True/False を返します
-df["blink"] = df["Pupil diameter left"].isna() & df["Pupil diameter right"].isna()
-
-# --- 3. ScreenRecordingStart のインデックス番号取得 ---
-starts_idx = df.index[df["event"] == "ScreenRecordingStart"].tolist()
-
-# --- 4. 試行ごとの瞬き回数 ---
-results = []
-for i, idx in enumerate(starts_idx):
-    trial_start_ts = df.loc[idx, "Eyetracker timestamp"]
-    duration_ms = trials[i][2] * 1000  # JSON の duration を ms に変換
-    trial_end_ts = trial_start_ts + duration_ms
-
-    # 試行区間抽出
-    mask = (df["Eyetracker timestamp"] >= trial_start_ts) & (df["Eyetracker timestamp"] < trial_end_ts)
-    sub = df.loc[mask, ["Eyetracker timestamp", "blink"]].reset_index(drop=True)
-
-    # --- 瞬きカウント（500ms以上） ---
-    blink_count = 0
-    in_blink = False
-    blink_start = None
-
-    for idx2, row in sub.iterrows():
-        if row["blink"] and not in_blink:
-            in_blink = True
-            blink_start = row["Eyetracker timestamp"]
-        elif not row["blink"] and in_blink:
-            blink_end = sub.loc[idx2-1, "Eyetracker timestamp"]
-            if (blink_end - blink_start) >= 500:
-                blink_count += 1
-            in_blink = False
-
-    # 最後まで瞬き中で終わる場合
-    if in_blink:
-        blink_end = sub.iloc[-1]["Eyetracker timestamp"]
-        if (blink_end - blink_start) >= 500:
-            blink_count += 1
-
-    # 次の試行開始までのインターバル
-    if i+1 < len(starts_idx):
-        next_start_ts = df.loc[starts_idx[i+1], "Eyetracker timestamp"]
-        interval_ms = next_start_ts - trial_end_ts
-    else:
-        interval_ms = None
-
-    results.append([i+1, trial_start_ts, trial_end_ts, duration_ms, blink_count, interval_ms])
-
-# --- 4. DataFrame化 & 保存 ---
-df_blinks = pd.DataFrame(
-    results, 
-    columns=["trial", "trial_start_ts", "trial_end_ts", "duration_ms", "blink_count", "interval_ms"]
+# --- 瞳孔径のみで瞬き候補 ---
+# NaN または 0.5未満を瞬き候補
+blink_mask = (
+    df["Pupil diameter left"].isna() |
+    df["Pupil diameter right"].isna() |
+    (df["Pupil diameter left"] < 0.5) |
+    (df["Pupil diameter right"] < 0.5)
 )
-df_blinks.to_csv("trial_blink_counts.csv", index=False)
 
-print(df_blinks.head())
+#true/False を 1/0 に変換して新しい列を追加
+df["blink"] = blink_mask.astype(int)
+
+# --- time_result.json読み込み ---
+with open("time_result.json", "r", encoding="utf-8") as f:
+    trials = json.load(f)  # [[start_time, end_time, duration], ...]
+
+# --- ScreenRecordingStart を基準にして count_blinks を呼ぶ ---
+def count_blinks_from_event_duration(trials,min_duration_ms=500):
+    blinks_per_trial = []
+
+    # ScreenRecordingStart の ts を取得
+    event_starts = df[df["Event"] == "ScreenRecordingStart"]["ts"].values
+
+    #iは試行番号、start_origはjsonのstart_time、durationはjsonのduration
+    for i, (start_orig, _, duration) in enumerate(trials):
+        # TSV 内の ScreenRecordingStart に対応する start_ms
+        if i < len(event_starts):
+            start_ms = event_starts[i]
+        else:
+            start_ms = start_orig * 1000  # 保険で json の start_time を使う
+
+        end_ms = start_ms + duration * 1000  # duration 秒分
+
+        d = df[(df["ts"] >= start_ms) & (df["ts"] < end_ms)].copy()
+        if d.empty:
+            blinks_per_trial.append(0)
+            continue
+
+        # 連続欠損区間を検出
+        changes = d["blink"].diff().fillna(0)
+        starts = d.index[changes == 1]
+        ends   = d.index[changes == -1]
+
+        if len(ends) < len(starts):
+            ends = ends.append(pd.Index([d.index[-1]]))
+
+        blinks = 0
+        for s, e in zip(starts, ends):
+            duration_ms = d.loc[e, "ts"] - d.loc[s, "ts"]
+            if duration_ms >= min_duration_ms:
+                blinks += 1
+
+        blinks_per_trial.append(blinks)
+
+    return blinks_per_trial
+
+# --- 実行 ---
+blink_counts = count_blinks_from_event_duration(trials)
+print("各試行の瞬き回数:", blink_counts)
+
