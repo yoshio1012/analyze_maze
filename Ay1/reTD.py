@@ -3,7 +3,7 @@
 import json
 
 # すでに保存したTD誤差を読み込む
-with open("Ay1/y101_TD_error.json", "r") as f:
+with open("Ay1/y103_TD_error.json", "r") as f:
     step_TD = json.load(f)
 
 trial_TD = {}
@@ -19,7 +19,7 @@ for params, trials in step_TD.items():
     trial_TD[params] = trial_results
 
 # 保存
-with open("Ay1/y101_TD_trial.json", "w") as f:
+with open("Ay1/y103_TD_trial.json", "w") as f:
     json.dump(trial_TD, f, indent=2)
 
-print("試行ごとにまとめた結果を y101_TD_trial.json に保存しました。")
+print("試行ごとにまとめた結果を y103_TD_trial.json に保存しました。")
