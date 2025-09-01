@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 # --- TSV読み込み ---
-df = pd.read_csv("data/raw/yobi101.tsv", sep="\t")
+df = pd.read_csv("data/raw/yobi103.tsv", sep="\t")
 df["ts"] = df["Eyetracker timestamp"].astype(float)  # µs 
 
 
@@ -20,7 +20,7 @@ blink_mask = (
 df["blink"] = blink_mask.astype(int)
 
 # --- time_result.json読み込み（Trialを生成） ---
-with open("yobi1/ep1_result/time_result.json", "r", encoding="utf-8") as f:
+with open("yobi1/ep3_result/time_result.json", "r", encoding="utf-8") as f:
     trials = json.load(f)  # [[start, end, duration], ...]
 
 Trial = []
