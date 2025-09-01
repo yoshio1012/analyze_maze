@@ -3,14 +3,17 @@ import json
 
 # --- TSV読み込み ---
 df = pd.read_csv("data/raw/yobi101.tsv", sep="\t")
-df["ts"] = df["Computer timestamp"].astype(float)  # ミリ秒
+df["ts"] = df["Eyetracker timestamp"].astype(float)  # µs 
+
+
+# --- 数値型に変換 ---
+df["Pupil diameter left"] = pd.to_numeric(df["Pupil diameter left"], errors="coerce")
+df["Pupil diameter right"] = pd.to_numeric(df["Pupil diameter right"], errors="coerce")
 
 # --- 瞬き候補 ---
 blink_mask = (
-    df["Pupil diameter left"].isna() |
-    df["Pupil diameter right"].isna() |
-    (df["Pupil diameter left"] < 0.5) |
-    (df["Pupil diameter right"] < 0.5)
+    df["Pupil diameter left"].isna() &
+    df["Pupil diameter right"].isna()
 )
 
 #true/False を 1/0 に変換して新しい列を追加
@@ -22,23 +25,25 @@ with open("yobi1/ep1_result/time_result.json", "r", encoding="utf-8") as f:
 
 Trial = []
 for i in range(len(trials)):
-    Trial.append(("duration", trials[i][2]))
+    Duration_us = trials[i][2] * 1000000  # 秒 → µs に変換
+    Trial.append(("duration", Duration_us))
     if i < len(trials) - 1:
-        interval = trials[i+1][0] - trials[i][1]
-        Trial.append(("interval", interval))
+        interval_us = (trials[i+1][0] - trials[i][1])*1000000  # 秒 → µs に変換
+        Trial.append(("interval", interval_us))
 
 # --- 瞬き数カウント ---
-def count_blinks_from_event(Trial, min_duration_ms=500):
+def count_blinks_from_event(Trial):
     results = []
 
-    # ScreenRecordingStart の基準時刻
-    start_event_ts = df[df["Event"] == "ScreenRecordingStart"]["ts"].values[0]
+    # --- ScreenRecordingStart の基準時刻 ---
+    event_idx = df.index[df["Event"] == "ScreenRecordingStart"][0]  # イベント行のインデックス
+    start_event_ts = df.loc[event_idx + 1, "ts"]  # 次の行のタイムスタンプを取る
 
     current_time = start_event_ts  # 今の基準時刻（ms）
 
     for kind, length in Trial:
         start = current_time
-        end = start + length*1000  # JSONは秒単位 → ms に変換
+        end = start + length
         current_time = end
 
         if kind == "duration":
@@ -55,7 +60,7 @@ def count_blinks_from_event(Trial, min_duration_ms=500):
                 elif b == 0 and in_blink:
                     in_blink = False
                     blink_end = t
-                    if (blink_end - blink_start) >= min_duration_ms:
+                    if 500_000 >= (blink_end - blink_start) >= 50_000:
                         blinks.append((blink_start, blink_end))
 
             results.append(len(blinks))
