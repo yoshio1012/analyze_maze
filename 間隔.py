@@ -1,7 +1,7 @@
 import pandas as pd
 
 # --- TSV 読み込み ---
-df = pd.read_csv("data/raw/yobi101.tsv", sep="\t")
+df = pd.read_csv("data/raw/No2/ep1_result/0201.tsv", sep="\t")
 df.columns = df.columns.str.strip()
 
 # --- 開始: ScreenRecordingStart の最初の行 ---
