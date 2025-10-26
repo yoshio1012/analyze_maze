@@ -8,16 +8,16 @@ goal_rows = 27
 goal_cols = 3
 
 #行動履歴データ
-with open("data/raw/No24/ep2_result/move_history.json", 'r') as f:
+with open("data/raw/No7/ep2_result/move_history.json", 'r') as f:
     move_data = json.load(f)
 
-with open("data/raw/No24/ep2_result/visited_history.json", 'r') as f:
+with open("data/raw/No7/ep2_result/visited_history.json", 'r') as f:
     visited_data = json.load(f)
 
 #TD学習のパラメータ
 alpha = [0.1, 0.5, 0.9]
 gamma = [0.1, 0.5, 0.9]
-Reward = 0.0
+Reward = 60.0
 penalty = -1.0
 
 #価値関数を入れるための迷路リストの作製
@@ -75,7 +75,7 @@ for Alp in alpha:
 
 
 # ===== 保存 =====
-with open("data/raw/No24/ep2_result/TD_error.json", "w") as f:
+with open("data/raw/No7/ep2_result/TD_error.json", "w") as f:
     json.dump(All_TD, f, indent=2)
 
 print("TD誤差を TD_error_results.json に保存しました。")
