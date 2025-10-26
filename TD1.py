@@ -10,14 +10,14 @@ import os
 
 with open("maze_data/maze1.json", 'r') as f:
     maze_data = json.load(f)
-goal_rows = 3
-goal_cols = 27
+goal_rows = 1
+goal_cols = 21
 
 #行動履歴データ
-with open("yobi2/ep1_result/move_history.json", 'r') as f:
+with open("data/raw/No24/ep1_result/move_history.json", 'r') as f:
     move_data = json.load(f)
 
-with open("yobi2/ep1_result/visited_history.json", 'r') as f:
+with open("data/raw/No24/ep1_result/visited_history.json", 'r') as f:
     visited_data = json.load(f)
 
 #TD学習のパラメータ
@@ -81,7 +81,7 @@ for Alp in alpha:
 
 
 # ===== 保存 =====
-with open("Ay2/y201_TD_error.json", "w") as f:
+with open("data/raw/No24/ep1_result/TD_error.json", "w") as f:
     json.dump(All_TD, f, indent=2)
 
 print("TD誤差を TD_error_results.json に保存しました。")
