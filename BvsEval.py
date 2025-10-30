@@ -45,7 +45,7 @@ for key, Blink in blink_data.items():
     # TD誤差（右軸）
     ax2 = ax1.twinx()
     ax2.plot(x, Blink, color='tab:red', linestyle='--', label='blink')
-    ax2.set_ylabel("TD error", color='tab:red')
+    ax2.set_ylabel("Blink", color='tab:red')
     ax2.tick_params(axis='y', labelcolor='tab:red')
 
     # --- タイトル・凡例 ---
