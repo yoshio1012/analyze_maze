@@ -56,7 +56,7 @@ for key, td_values in td_data.items():
     fig.tight_layout()
 
     # --- 保存 ---
-    save_path = os.path.join(save_dir, f"{no}_{ep}_TD_vs_eval.png")
+    save_path = os.path.join(save_dir, f"{no}_{ep}_aveTD_vs_eval.png")
     plt.savefig(save_path, dpi=300)
     plt.close()
 
