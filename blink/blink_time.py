@@ -16,7 +16,8 @@ for key, blink_times in gaze_all.items():
     step_results = step_data["alpha=0.1, gamma=0.1"]
     step_time=[a/b for a,b in zip(blink_times, step_results)]
 
-    with open(time_path, "w", encoding="utf-8") as time_file:
+    time_path2 = f"data/raw/No{first}/ep{second}_result/blinkstep.json"
+    with open(time_path2, "w", encoding="utf-8") as time_file:
         #step_timeをtime_pathに新たにjson形式で保存
         json.dump(step_time, time_file, ensure_ascii=False, indent=4)
 
