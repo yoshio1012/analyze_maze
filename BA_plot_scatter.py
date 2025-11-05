@@ -3,19 +3,19 @@ import os
 import matplotlib.pyplot as plt
 
 # --- データ読み込み ---
-with open("data/processed/choice_dict_before.json", "r", encoding="utf-8") as f:
+with open("data/processed/blink_dict_before.json", "r", encoding="utf-8") as f:
     choice_dict_before = json.load(f)
-with open("data/processed/choice_dict_after.json", "r", encoding="utf-8") as f:
+with open("data/processed/blink_dict_after.json", "r", encoding="utf-8") as f:
     choice_dict_after = json.load(f)
 
-with open("data/processed/blink_dict_before.json", "r", encoding="utf-8") as f:
+with open("data/processed/TD_dict_before.json", "r", encoding="utf-8") as f:
     blink_dict_before = json.load(f)
-with open("data/processed/blink_dict_after.json", "r", encoding="utf-8") as f:
+with open("data/processed/TD_dict_after.json", "r", encoding="utf-8") as f:
     blink_dict_after = json.load(f)
 
 
 # --- 保存フォルダ作成 ---
-save_dir = "figures/choice_blink_scatter_compare"
+save_dir = "figures/blink_TD_scatter_compare"
 os.makedirs(save_dir, exist_ok=True)
 
 for key in choice_dict_before.keys():
@@ -31,9 +31,9 @@ for key in choice_dict_before.keys():
     plt.figure(figsize=(6, 6))
     plt.scatter(cb, bb, color="skyblue", label="Before", alpha=0.7)
     plt.scatter(ca, ba, color="salmon", label="After", alpha=0.7)
-    plt.title(f"{key} - Choice vs Blink (Before/After)")
-    plt.xlabel("Choice")
-    plt.ylabel("Blink")
+    plt.title(f"{key} - blink vs TD (Before/After)")
+    plt.xlabel("blink")
+    plt.ylabel("TD")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
