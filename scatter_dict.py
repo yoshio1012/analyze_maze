@@ -1,61 +1,45 @@
 import json
 import os
-import matplotlib.pyplot as plt
-from scipy.stats import pearsonr
+from collections import defaultdict
 
 # --- ファイル読み込み ---
 with open("data/processed/stepTD_dict_after.json", "r", encoding="utf-8") as f:
-    data_before = json.load(f)
+    stepTD_data = json.load(f)
 
 with open("data/processed/blink_dict_after.json", "r", encoding="utf-8") as f:
-    data_after = json.load(f)
+    blink_data = json.load(f)
+
+with open("data/processed/choice_dict_after.json", "r", encoding="utf-8") as f:
+    choice_data = json.load(f)
+
+# --- 参加者ごとにまとめる関数 ---
+def group_by_participant(data_dict):
+    grouped = defaultdict(list)
+    for key, values in data_dict.items():
+        if not isinstance(values, list):
+            continue
+        # 例: "p0103" → "p01"
+        base_key = key[:3]  # "p01"
+        grouped[base_key].extend(values)
+    return dict(grouped)
+
+# --- グルーピング ---
+stepTD_grouped = group_by_participant(stepTD_data)
+blink_grouped = group_by_participant(blink_data)
+choice_grouped = group_by_participant(choice_data)
 
 # --- 保存フォルダ ---
-save_dir = "figures/scatter_stepTDVSblink_after"
+save_dir = "data/processed/grouped"
 os.makedirs(save_dir, exist_ok=True)
 
-# --- 共通のキーで処理 ---
-for key in data_before.keys():
-    if key not in data_after:
-        continue  # 片方にしかないデータはスキップ
+# --- JSON出力 ---
+with open(os.path.join(save_dir, "stepTD_grouped_after.json"), "w", encoding="utf-8") as f:
+    json.dump(stepTD_grouped, f, ensure_ascii=False, indent=2)
 
-    x = data_before[key]
-    y = data_after[key]
+with open(os.path.join(save_dir, "blink_grouped_after.json"), "w", encoding="utf-8") as f:
+    json.dump(blink_grouped, f, ensure_ascii=False, indent=2)
 
-    # Noneや空リストをスキップ
-    if x is None or y is None:
-        print(f"⚠️ {key}: Noneを含むためスキップ")
-        continue
-    if not isinstance(x, list) or not isinstance(y, list):
-        print(f"⚠️ {key}: リストではないためスキップ")
-        continue
-    if len(x) < 2 or len(y) < 2:
-        print(f"⚠️ {key}: データ数が少ないためスキップ")
-        continue
+with open(os.path.join(save_dir, "choice_grouped_after.json"), "w", encoding="utf-8") as f:
+    json.dump(choice_grouped, f, ensure_ascii=False, indent=2)
 
-    # データ長を合わせる
-    min_len = min(len(x), len(y))
-    x = x[:min_len]
-    y = y[:min_len]
-
-    # 相関係数計算
-    try:
-        r, p = pearsonr(x, y)
-    except Exception as e:
-        print(f"⚠️ {key}: 相関係数の計算に失敗 ({e})")
-        continue
-
-    # 散布図作成
-    plt.figure()
-    plt.scatter(x, y)
-    plt.title(f"{key}\n r={r:.2f}, p={p:.3f}")
-    plt.xlabel("stepTD")
-    plt.ylabel("blink")
-    plt.grid(True)
-
-    # 保存
-    save_path = os.path.join(save_dir, f"{key}.png")
-    plt.savefig(save_path)
-    plt.close()
-
-print("✅ 完了：全参加者の散布図を保存しました！")
+print("✅ 完了：p0101~p0103 を p01 のようにまとめたJSONを保存しました！")
