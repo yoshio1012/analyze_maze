@@ -8,7 +8,7 @@ with open(eval_path, "r", encoding="utf-8") as f:
     blink_data = json.load(f)
 
 # 保存先
-save_dir = "paper/subjective_evaluation/evaluation_only"
+save_dir = "paper/subjective_evaluation"
 os.makedirs(save_dir, exist_ok=True)
 
 # ★ 論文用に軸を固定（ここが重要）
@@ -42,10 +42,10 @@ for key, _ in blink_data.items():
     ax.set_ylabel("subjective_evaluation (1–7)")
 
     # ★ 軸範囲・目盛を統一
-    ax.set_xlim(1, X_MAX)
+    ax.set_xlim(0.5, X_MAX+0.5)
     ax.set_xticks(range(1, X_MAX + 1, 10))
 
-    ax.set_ylim(Y_MIN, Y_MAX)
+    ax.set_ylim(0.5, 7.5)
     ax.set_yticks(range(1, 8))
 
     # 装飾（控えめ）
