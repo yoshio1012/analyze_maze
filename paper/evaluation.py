@@ -12,7 +12,7 @@ save_dir = "paper/subjective_evaluations"
 os.makedirs(save_dir, exist_ok=True)
 
 # ★ 論文用に軸を固定（ここが重要）
-X_MAX = 50          # trial 数の最大（実データに合わせて調整）
+X_MAX = 55          # trial 数の最大（実データに合わせて調整）
 Y_MIN, Y_MAX = 1, 7
 
 for key, _ in blink_data.items():
