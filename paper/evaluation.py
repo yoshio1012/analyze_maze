@@ -8,7 +8,7 @@ with open(eval_path, "r", encoding="utf-8") as f:
     blink_data = json.load(f)
 
 # 保存先
-save_dir = "subjective_evaluations/figures"
+save_dir = "paper/subjective_evaluations"
 os.makedirs(save_dir, exist_ok=True)
 
 # ★ 論文用に軸を固定（ここが重要）
