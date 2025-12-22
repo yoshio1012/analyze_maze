@@ -7,7 +7,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 # 妥協案：見た目調整
 # ===============================
 plt.rcParams.update({
-    "font.size": 7,
+    "font.size": 6,
     "axes.titlesize": 8,
     "axes.labelsize": 7,
     "xtick.labelsize": 6,
