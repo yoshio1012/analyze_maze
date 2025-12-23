@@ -26,8 +26,8 @@ with open(eval_path, "r", encoding="utf-8") as f:
 save_dir = "paper/blink"
 os.makedirs(save_dir, exist_ok=True)
 
-pdf_path_main = os.path.join(save_dir, "blink_5x2.pdf")
-pdf_path_last = os.path.join(save_dir, "blink_last_1x2.pdf")
+pdf_path_main = os.path.join(save_dir, "blink.pdf")
+pdf_path_last = os.path.join(save_dir, "blink_last.pdf")
 
 # --- 軸固定 ---
 X_MAX = 55
@@ -78,7 +78,7 @@ with PdfPages(pdf_path_main) as pdf:
         if idx // 2 == 4:
             ax.set_xlabel("Trial")
         if idx % 2 == 0:
-            ax.set_ylabel("blink")
+            ax.set_ylabel("Blink")
 
         leftover_data.append((x, blink, f"No{first}-ep{second}"))
         idx += 1
@@ -113,7 +113,7 @@ if len(leftover_data) == 2:
             ax.set_title(title, pad=2)
             ax.grid(True, linestyle=':', linewidth=0.5)
 
-        axes[0].set_ylabel("blink")
+        axes[0].set_ylabel("Blink")
         axes[0].set_xlabel("Trial")
         axes[1].set_xlabel("Trial")
 
