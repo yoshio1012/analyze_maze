@@ -1,15 +1,17 @@
+#参加者ごとのデータをまとめるスクリプト
+
 import json
 import os
 from collections import defaultdict
 
 # --- ファイル読み込み ---
-with open("data/processed/stepTD_dict_after.json", "r", encoding="utf-8") as f:
+with open("data/processed/TD.json", "r", encoding="utf-8") as f:
     stepTD_data = json.load(f)
 
-with open("data/processed/blink_dict_after.json", "r", encoding="utf-8") as f:
+with open("data/processed/blink.json", "r", encoding="utf-8") as f:
     blink_data = json.load(f)
 
-with open("data/processed/choice_dict_after.json", "r", encoding="utf-8") as f:
+with open("data/processed/choice.json", "r", encoding="utf-8") as f:
     choice_data = json.load(f)
 
 # --- 参加者ごとにまとめる関数 ---
@@ -33,13 +35,13 @@ save_dir = "data/processed/grouped"
 os.makedirs(save_dir, exist_ok=True)
 
 # --- JSON出力 ---
-with open(os.path.join(save_dir, "stepTD_grouped_after.json"), "w", encoding="utf-8") as f:
+with open(os.path.join(save_dir, "TD_grouped.json"), "w", encoding="utf-8") as f:
     json.dump(stepTD_grouped, f, ensure_ascii=False, indent=2)
 
-with open(os.path.join(save_dir, "blink_grouped_after.json"), "w", encoding="utf-8") as f:
+with open(os.path.join(save_dir, "blink_grouped.json"), "w", encoding="utf-8") as f:
     json.dump(blink_grouped, f, ensure_ascii=False, indent=2)
 
-with open(os.path.join(save_dir, "choice_grouped_after.json"), "w", encoding="utf-8") as f:
+with open(os.path.join(save_dir, "choice_grouped.json"), "w", encoding="utf-8") as f:
     json.dump(choice_grouped, f, ensure_ascii=False, indent=2)
 
 print("✅ 完了：p0101~p0103 を p01 のようにまとめたJSONを保存しました！")
